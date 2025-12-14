@@ -12,26 +12,47 @@ class Postes extends Model
 
     public function InsertPostes(array $data)
     {
-        return DB::insert(
-            'INSERT INTO postes (titre, contenu, created_at, updated_at)
-            VALUES (?, ?, ?, ?)',
-            [$data['titre'], $data['contenu'], now(), now()]
-        );
+        try {
+            return DB::insert(
+                'INSERT INTO postes (titre, contenu, created_at, updated_at) VALUES (?, ?, ?, ?)',
+                [$data['titre'], $data['contenu'], now(), now()]
+            );
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
+
 
     public function getById(int $id)
     {
-        return DB::selectOne(
-            'SELECT id, titre, contenu, created_at, updated_at
-            FROM postes
-            WHERE id = ?',
-            [$id]
-        );
-    }
+        try {
+            return DB::selectOne(
+                'SELECT id, titre, contenu, created_at, updated_at
+                FROM postes
+                WHERE id = ?',
+                [$id]
+            );
+        } catch (\Exception $e) {
+            return null;        
+        }
+    }    
+
+    public function getAllPostes()
+    {
+        try {
+            return DB::select(
+                'SELECT id, titre, contenu, created_at, updated_at FROM postes'
+            );
+        } catch (\Exception $e) {
+            return [];    
+        }
+    }    
+
 
     public function updateById(int $id, array $data)
     {
-        $updated = DB::update(
+        try {
+            $updated = DB::update(
             'UPDATE postes SET titre = ?, contenu = ?, updated_at = NOW() WHERE id = ?',
             [$data['titre'], $data['contenu'], $id]
         );
@@ -41,17 +62,27 @@ class Postes extends Model
         }
 
         return null;
+        
+        } catch (\Exception $e) {
+            return null;        
+        }
     }
 
     public function deleteById(int $id)
     {
-        $deleted = DB::delete(
-            'DELETE FROM postes
-            WHERE id = ?',[$id]
-        );
-
-        return $deleted;
+        try {
+            $deleted = DB::delete(
+                'DELETE FROM postes WHERE id = ?',
+                [$id]
+            );
+            return $deleted;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
+
+
+
 
 }
 
