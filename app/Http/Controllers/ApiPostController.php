@@ -19,8 +19,14 @@ class ApiPostController extends Controller
             'contenu' => 'required|string',
         ]);
 
-        $postes = new Postes();
-        $postes->InsertPostes($data);
+        $poste = (new Postes())->InsertPostes($data);
+
+        if (!$poste) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur, insretion a échoué'
+            ], 500);
+        }
 
         return response()->json(
             ['message' => 'Poste inserré'],
@@ -34,7 +40,7 @@ class ApiPostController extends Controller
 
         if (!$poste) {
             return response()->json([
-                'message' => 'Poste non trouvé'
+                'message' => 'Erreur,Poste introuvable'
             ], 404);
         }
 
@@ -49,10 +55,18 @@ class ApiPostController extends Controller
 
     public function updatePostes(int $id, Request $request)
     {
-        $poste = (new Postes())->updateById($id, $request->only(['titre', 'contenu']));
+        $data = $request->validate([
+            'titre' => 'required|string|min:3|max:255',
+            'contenu' => 'required|string|min:10',
+        ]);
+
+        $poste = (new Postes())->updateById($id, $data);
 
         if (!$poste) {
-            return response()->json(['message' => 'Poste non trouvé'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur, Poste introuvable'
+            ], 404);
         }
 
         return response()->json([
@@ -69,10 +83,16 @@ class ApiPostController extends Controller
         $deleted = (new Postes())->deleteById($id);
 
         if (!$deleted) {
-            return response()->json(['message' => 'Poste non trouvé'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Poste non trouvé , impossible de supprimer'
+            ], 404);
         }
 
-        return response()->json(['message' => 'Poste effacé'], 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'Poste effacé'
+        ], 200);
     }
 
 
