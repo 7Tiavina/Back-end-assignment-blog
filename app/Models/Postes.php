@@ -44,7 +44,7 @@ class Postes extends Model
                 'SELECT id, titre, contenu, created_at, updated_at FROM postes'
             );
         } catch (\Exception $e) {
-            return [];    
+            return null;    
         }
     }    
 
